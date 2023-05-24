@@ -11,15 +11,24 @@ export default function App() {
 
   function fetchStockData(name) {
     const stockTick = name;
-    const link = `https://api.polygon.io/v1/open-close/${stockTick}/2023-01-09?adjusted=true&apiKey=Rt_Xvwhy10Q2VopfNpQRhZgOgQUUWjLV`
+    const date = new Date();
+    const formatDate = `${date.getFullYear()}-${date.getMonth() < 10 ? '0' + date.getMonth() : date.getMonth()}-${date.getDay() < 10 ? '0' + date.getDay() : date.getDay()}`
+    console.log(formatDate)
+    const link = 
+      `https://api.polygon.io/v2/aggs/ticker/${stockTick}/range/1/month/2020-01-09/${formatDate}?adjusted=true&sort=asc&limit=5000&apiKey=Rt_Xvwhy10Q2VopfNpQRhZgOgQUUWjLV`
     fetch(link)
       .then((response) => {
         return response.json();
       })
       .then((data) => {
-        console.log(data)
+        const transformedData = data.results.map(stockData => {
+          return {
+            ticker: data.ticker, 
+            close: stockData.c
+          }
+        })
         setStockListData(prev => {
-          return [...prev, data]
+          return [...prev, transformedData]
         })
       })
   }
@@ -37,6 +46,8 @@ export default function App() {
     
     ref.current.value = "";
   }
+
+  console.log(stockListData)
 
   return (
     <div>
