@@ -10,6 +10,15 @@ export default function App() {
   let stockName = '';  
 
   useEffect(() => {
+    if (Object.keys(stockListData[0]).length === 0) {
+      console.log("Prazno")
+      setStockListData(prev => {
+        prev.unshift();
+        return prev;
+      })
+    }
+  }, [])
+  useEffect(() => {
     localStorage.setItem("stocks", JSON.stringify(stockListData))
   }, [stockListData]);
 
@@ -32,11 +41,15 @@ export default function App() {
           }
         })
         setStockListData(prev => {
-          return [...prev, transformedData]
+          if (prev == {}) {
+            return [...prev, transformedData]
+          } else {
+            console.log("gotovo")
+            return [transformedData]
+          }
         })
       })
   }
-
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -63,7 +76,7 @@ export default function App() {
           ref = {ref}
         />
       </form>
-      
+      <StockList stockListData = {stockListData}/>
     </div>
   )
 }
