@@ -5,9 +5,9 @@ import './App.css'
 
 export default function App() {
 
-  const [stockName, setStockName] = useState('');
+  const [stockListData, setStockListData] = useState([{}])
   const ref = useRef(null);
-  const stockListData = [{}]
+  let stockName = '';  
 
   function fetchStockData(name) {
     const stockTick = name;
@@ -17,8 +17,10 @@ export default function App() {
         return response.json();
       })
       .then((data) => {
-        stockListData.push(data)
-        console.log(stockListData)
+        console.log(data)
+        setStockListData(prev => {
+          return [...prev, data]
+        })
       })
   }
 
@@ -30,13 +32,12 @@ export default function App() {
     const formData = new FormData(form);
     const formJson = Object.fromEntries(formData.entries());
     
-    setStockName(formJson.stockName);
-    
+    stockName = formJson.stockName;
     fetchStockData(stockName);
     
     ref.current.value = "";
   }
-  console.log(stockListData)
+
   return (
     <div>
       <Navbar />
@@ -47,7 +48,6 @@ export default function App() {
           ref = {ref}
         />
       </form>
-      <StockList stockListData = {stockListData}/>
     </div>
   )
 }
