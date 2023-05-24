@@ -5,9 +5,13 @@ import './App.css'
 
 export default function App() {
 
-  const [stockListData, setStockListData] = useState([{}])
+  const [stockListData, setStockListData] = useState(() => JSON.parse(localStorage.getItem("stocks")))
   const ref = useRef(null);
   let stockName = '';  
+
+  useEffect(() => {
+    localStorage.setItem("stocks", JSON.stringify(stockListData))
+  }, [stockListData]);
 
   function fetchStockData(name) {
     const stockTick = name;
@@ -59,6 +63,7 @@ export default function App() {
           ref = {ref}
         />
       </form>
+      
     </div>
   )
 }
