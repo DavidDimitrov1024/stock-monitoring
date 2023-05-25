@@ -1,12 +1,35 @@
-import React from "react"
+import { React, useEffect, useSate } from "react"
 
-export default function StockList({stockListData}) {
-    const stockElements = stockListData.map((el, index) => {
+export default function StockList(props) {
+    const MINUTE_MS = 10000;
+    useEffect(() => {
+    const interval = setInterval(() => {
+        props.fetchStockData(props.currStockTicker)
+        console.log(props.stockListData[0].result[0].c)
+    }, MINUTE_MS);
+    return () => clearInterval(interval);
+    }, [])
+
+
+    const stockElements = props.stockListData.map((el, index) => (
         <div key = {index} >
-            <h3>{el.ticker}</h3>
+            <div 
+                className = "stock-box"
+                onClick = {() => {
+                    return props.setCurrStockTicker(el.ticker)
+                }}    
+            >
+                <h4 className = "text-snipets">{el.ticker}</h4>
+                <button 
+                    className="delete-btn"
+                    onClick={(event) => props.deleteStock(event, el.ticker)}
+                >
+                    <i className="gg-trash"></i>
+                </button>
+            </div>
         </div>
-    });
-   // console.log(stockElements)
+    ));
+
     return (
         <div>
             {stockElements}
