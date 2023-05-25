@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import {useParams} from 'react-touter-dom'
 import Navbar from './components/Navbar'
 import StockList from "./components/StockList"
 import './App.css'
