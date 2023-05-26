@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Navbar from './components/Navbar'
 import StockList from "./components/StockList"
+import Split from "react-split"
 import './App.css'
 
 export default function App() {
@@ -10,9 +11,10 @@ export default function App() {
   const [currStockTicker, setCurrStockTicker] = useState(
     (stockListData[0] && stockListData[0].ticker) || ""
   )
+  const [displayChart, setDisplayChart] = useState(false);
   const ref = useRef(null);
   let stockName = '';  
-  const empty = []
+  const empty = [];
 
   useEffect(() => {
     localStorage.setItem("stocks", JSON.stringify(stockListData))
@@ -27,7 +29,6 @@ export default function App() {
   }
 
   function fetchStockData(name) {
-    
     const stockTick = name;
     const timeStamp = 'minute';
     const multiplier = '5';
@@ -42,30 +43,54 @@ export default function App() {
         return response.json();
       })
       .then((data) => {
-        setStockListData(prev => {
-          if (stockListData.length != 0){
-          return [{
-              ...prev,
-              ticker: data.ticker,
-              result: data.results
-            }]
-          } else {
-            return [{ 
-              ticker: data.ticker,
-              result: data.results
-            }]
-          }
-        })
-        setCurrStockTicker(data.ticker)
+        console.log(data.status)
+        if(data.status === "OK"){
+          setStockListData(prev => {
+            if (stockListData.length != 0){
+              if (stockListData?.find(el => el.ticker === prev.ticker)){
+                console.log("Nasko e gei")
+                return [
+                    ...prev,{
+                    ticker: data.ticker,
+                    result: data.results
+                  }]
+              } else {
+                let newData = [];
+                console.log(prev)
+                prev.map(el => {
+                  if (el.ticker === data.ticker) {
+                    newData.push({  
+                      ticker: data.ticker,
+                      result: data.results
+                    })
+                  } else {
+                      newData.push({
+                        ticker: prev.ticker, 
+                        result: prev.results
+                    })
+                  }
+                })
+                console.log(newData)
+                return newData;
+              }
+            } else {
+              return [{ 
+                ticker: data.ticker,
+                result: data.results
+              }]
+            }
+          })
+          setCurrStockTicker(data.ticker)
+        }
       })
   }
-
+  console.log(stockListData)
   function findCurrStockTicker() {
-    const currStock = stockListData.find(list => {
+    const currStock = stockListData?.find(list => {
       return list.ticker === currStockTicker;
     }) || stockListData[0].ticker;
 
-    return currStock.ticker;
+    return (currStock?.ticker) || '';
   }
 
   function handleSubmit(e) {
@@ -77,7 +102,7 @@ export default function App() {
     
     stockName = formJson.stockName;
     fetchStockData(stockName);
-    
+
     ref.current.value = "";
   }
 
@@ -85,26 +110,46 @@ export default function App() {
     event.stopPropagation();
     setStockListData(prev => prev.filter(stock => stock.ticker !== stockTicker))
   }
-
+  
   return (
-    <div>
-      <Navbar />
-      <form method = "post" onSubmit={handleSubmit}>
-        <button> Add </button>
-        <input 
-          name = "stockName"
-          ref = {ref}
-        />
-      </form>
-      {stockListData[0]?.ticker &&
-        <StockList 
-          stockListData = {stockListData}
-          currStockTicker = {findCurrStockTicker()}
-          setCurrStockTicker = {setCurrStockTicker}
-          deleteStock = {deleteStock}
-          fetchStockData = {fetchStockData}
-        />
-      }
-    </div>
+    <main>
+      {stockListData.length > 0 ? 
+        <>
+          <Navbar />
+            <form method="post" onSubmit={handleSubmit}>
+              <button> Add </button>
+              <input
+                name="stockName"
+                ref={ref} />
+            </form>
+          <Split
+            sizes={[80, 70]}
+            direction="horizontal"
+            className="split"
+          >
+                <StockList
+                  stockListData={stockListData}
+                  currStockTicker={findCurrStockTicker()}
+                  setCurrStockTicker={setCurrStockTicker}
+                  deleteStock={deleteStock}
+                  fetchStockData={fetchStockData}
+                  setDisplayChart = {setDisplayChart}
+                />
+                <div>{displayChart && <h4>chart here</h4>}</div >
+            </Split>
+          </>
+        : 
+        <div className = "no-stocks">
+          <h1>Add stocks to your watchlist</h1>
+          <form method="post" onSubmit={handleSubmit}>
+            <button> Add </button>
+            <input
+                name="stockName"
+                ref={ref} 
+            />
+          </form>
+        </div>
+    } 
+    </main>
   )
 }

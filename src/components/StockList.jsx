@@ -2,12 +2,13 @@ import { React, useEffect, useSate } from "react"
 
 export default function StockList(props) {
     const MINUTE_MS = 10000;
+
     useEffect(() => {
-    const interval = setInterval(() => {
-        props.fetchStockData(props.currStockTicker)
-        console.log(props.stockListData[0].result[0].c)
-    }, MINUTE_MS);
-    return () => clearInterval(interval);
+        const interval = setInterval(() => {
+            props.fetchStockData(props.currStockTicker)
+        }, MINUTE_MS);
+    
+        return () => clearInterval(interval);
     }, [])
 
 
@@ -16,7 +17,10 @@ export default function StockList(props) {
             <div 
                 className = "stock-box"
                 onClick = {() => {
-                    return props.setCurrStockTicker(el.ticker)
+                    return (
+                        props.setCurrStockTicker(el.ticker),
+                        props.setDisplayChart(prev => !prev)
+                    ) 
                 }}    
             >
                 <h4 className = "text-snipets">{el.ticker}</h4>
