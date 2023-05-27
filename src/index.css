@@ -31,7 +31,6 @@ nav {
   padding-inline-start: 30px; 
 }
 
-
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -53,38 +52,8 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-.gutter {
-  background-color: #646cff;
-
-  background-repeat: no-repeat;
-  background-position: 50%;
-}
-
-.gutter.gutter-horizontal {
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
-}
-
-.gutter.gutter-horizontal:hover {
-  cursor: col-resize;
-}
-
-.split {
-  display: flex;
-}
-
 .text-snipets {
   margin: 1.2em 1.2em;
-}
-
-
-
-.stock-box {
-  overflow: hidden;
-  width: 100%;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .gg-trash {
@@ -135,4 +104,25 @@ button:focus-visible {
   flex-direction: column;
   align-items: center;
   width: 100%;
+}
+
+.stock-box {
+  background-color: #1a1a1a;
+  border-bottom: 1px solid white;
+  overflow: hidden;
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.direction-up {
+  color: green;
+  font-weight: 400;
+}
+
+.direction-down {
+  color: red;
+  font-weight: 400;
 }

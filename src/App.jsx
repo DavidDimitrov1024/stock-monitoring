@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import Navbar from './components/Navbar'
 import StockList from "./components/StockList"
-import Split from "react-split"
 import './App.css'
 
 export default function App() {
@@ -10,11 +9,9 @@ export default function App() {
   )
   const [currStockTicker, setCurrStockTicker] = useState(
     (stockListData[0] && stockListData[0].ticker) || ""
-  )
-  const [displayChart, setDisplayChart] = useState(false);
-  const ref = useRef(null);
-  let stockName = '';  
-  const empty = [];
+  )  
+  const ref = useRef(null);  
+  let empty = [];
 
   useEffect(() => {
     localStorage.setItem("stocks", JSON.stringify(stockListData))
@@ -29,62 +26,60 @@ export default function App() {
   }
 
   function fetchStockData(name) {
-    const stockTick = name;
-    const timeStamp = 'minute';
-    const multiplier = '5';
-    const date = new Date();
-    const formatDateEnd = 
-      `${date.getFullYear()}-${date.getMonth() < 10 ? '0' + date.getMonth() : date.getMonth()}-${date.getDay() < 10 ? '0' + date.getDay() : date.getDay()}`;
-    const formatDateStart = '2023-01-01';
-    const link = 
-      `https://api.polygon.io/v2/aggs/ticker/${stockTick}/range/${multiplier}/${timeStamp}/2020-01-09/${formatDateEnd}?adjusted=true&sort=asc&limit=5000&apiKey=Rt_Xvwhy10Q2VopfNpQRhZgOgQUUWjLV`
-    fetch(link)
+    const url = `https://realstonks.p.rapidapi.com/${name}`
+      fetch(url, {
+        method: "GET", headers: {
+          'X-RapidAPI-Key': '0797411f85mshe8e28b38b23bf20p119c18jsnd1deb8753da6',
+          'X-RapidAPI-Host': 'realstonks.p.rapidapi.com'
+        }
+      })
       .then((response) => {
         return response.json();
       })
       .then((data) => {
-        console.log(data.status)
-        if(data.status === "OK"){
-          setStockListData(prev => {
-            if (stockListData.length != 0){
-              if (stockListData?.find(el => el.ticker === prev.ticker)){
-                console.log("Nasko e gei")
-                return [
-                    ...prev,{
-                    ticker: data.ticker,
-                    result: data.results
-                  }]
-              } else {
-                let newData = [];
-                console.log(prev)
-                prev.map(el => {
-                  if (el.ticker === data.ticker) {
-                    newData.push({  
-                      ticker: data.ticker,
-                      result: data.results
-                    })
-                  } else {
-                      newData.push({
-                        ticker: prev.ticker, 
-                        result: prev.results
-                    })
-                  }
-                })
-                console.log(newData)
-                return newData;
-              }
-            } else {
-              return [{ 
-                ticker: data.ticker,
-                result: data.results
-              }]
+        //ako ticker-a e veche syshtestvuvasht
+        if ( stockListData.find(el => {
+          return el.ticker === name
+        })
+        ) { 
+          //tuk updatevame stockListData        
+          setStockListData(prev => { 
+            const updatedDataForTicker = {
+              ticker: name,
+              price: data.price,
+              change_point: data.change_point, 
+              change_percentage: data.change_percentage,
+              total_vol: data.total_vol
             }
+            //mapping over the prev obj to find the component that needs to be changed
+            const updatedData = prev.map(el => {
+              if (el.ticker === updatedDataForTicker.ticker) {
+                return updatedDataForTicker;
+              } else {
+                return el;
+              }
+            })
+            return updatedData;  
           })
-          setCurrStockTicker(data.ticker)
-        }
-      })
+          setCurrStockTicker(name);
+          
+        } else {
+            ///ne e bila v lista oshte
+            setStockListData(prev => ([
+              ...prev, {
+                ticker: name,
+                price: data.price,
+                change_point: data.change_point,
+                change_percentage: data.change_percentage, 
+                total_vol: data.total_vol
+              }]
+            ))
+            setCurrStockTicker(name)
+          }
+        }) 
+        .catch((error) => console.log(error))
   }
-  console.log(stockListData)
+  
   function findCurrStockTicker() {
     const currStock = stockListData?.find(list => {
       return list.ticker === currStockTicker;
@@ -92,7 +87,8 @@ export default function App() {
 
     return (currStock?.ticker) || '';
   }
-
+  
+  
   function handleSubmit(e) {
     e.preventDefault();
 
@@ -100,17 +96,12 @@ export default function App() {
     const formData = new FormData(form);
     const formJson = Object.fromEntries(formData.entries());
     
-    stockName = formJson.stockName;
-    fetchStockData(stockName);
-
+    const stockName = formJson.stockName;
+    fetchStockData(stockName)
+    
     ref.current.value = "";
   }
 
-  function deleteStock(event, stockTicker) {
-    event.stopPropagation();
-    setStockListData(prev => prev.filter(stock => stock.ticker !== stockTicker))
-  }
-  
   return (
     <main>
       {stockListData.length > 0 ? 
@@ -122,21 +113,13 @@ export default function App() {
                 name="stockName"
                 ref={ref} />
             </form>
-          <Split
-            sizes={[80, 70]}
-            direction="horizontal"
-            className="split"
-          >
-                <StockList
-                  stockListData={stockListData}
-                  currStockTicker={findCurrStockTicker()}
-                  setCurrStockTicker={setCurrStockTicker}
-                  deleteStock={deleteStock}
-                  fetchStockData={fetchStockData}
-                  setDisplayChart = {setDisplayChart}
-                />
-                <div>{displayChart && <h4>chart here</h4>}</div >
-            </Split>
+          <StockList
+            stockListData={stockListData}
+            currStockTicker={findCurrStockTicker()}
+            setCurrStockTicker={setCurrStockTicker}
+            deleteStock={deleteStock}
+            fetchStockData={fetchStockData}
+          />
           </>
         : 
         <div className = "no-stocks">
