@@ -52,11 +52,11 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-.text-snipets {
-  margin: 1.2em 1.2em;
-}
+
 
 .gg-trash {
+  grid-row-start: 5;
+  grid-row-start: 5;
   box-sizing: border-box;
   position: relative; 
   display: block;
@@ -108,12 +108,13 @@ button:focus-visible {
 
 .stock-box {
   background-color: #1a1a1a;
+  border-top:rgba(255, 255, 255, 0.87);
   border-bottom: 1px solid white;
   overflow: hidden;
   width: 100%;
   cursor: pointer;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 0.45fr;
   align-items: center;
 }
 
@@ -125,4 +126,8 @@ button:focus-visible {
 .direction-down {
   color: red;
   font-weight: 400;
+}
+
+.text-snipets {
+  margin: 1em 1em;
 }

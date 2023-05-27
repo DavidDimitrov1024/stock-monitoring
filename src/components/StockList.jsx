@@ -24,16 +24,21 @@ export default function StockList(props) {
                     el.change_point > 0 ? "up" : "down"
                 }`}>
                     {el.price}
+                    $
                 </h4>
                 <h4 className = {`direction-${
                     el.change_point > 0 ? "up" : "down"
                 }`}>
-                     {el.change_point}
+                    {el.change_point > 0 ? "+" : "-"}
+                    {el.change_point}
+                    $
                 </h4>
                 <h4 className = {`direction-${
-                    el.change_point > 0 ? "up" : "down"
+                    el.change_percentage > 0 ? "up" : "down"
                 }`}>
+                    {el.change_percentage > 0 ? "+" : "-"}
                     {el.change_percentage}
+                    %
                 </h4>
                 <button 
                     className="delete-btn"

@@ -70,7 +70,7 @@ export default function App() {
                 ticker: name,
                 price: data.price,
                 change_point: data.change_point,
-                change_percentage: data.change_percentage, 
+                change_percentage: data.change_percentage,
                 total_vol: data.total_vol
               }]
             ))
